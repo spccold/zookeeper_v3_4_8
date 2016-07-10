@@ -107,6 +107,7 @@ public class ZooKeeperServerMain {
             zkServer.setTickTime(config.tickTime);
             zkServer.setMinSessionTimeout(config.minSessionTimeout);
             zkServer.setMaxSessionTimeout(config.maxSessionTimeout);
+            //use netty or nio in jdk directly(since zookeeper 3.4)
             cnxnFactory = ServerCnxnFactory.createFactory();
             cnxnFactory.configure(config.getClientPortAddress(),
                     config.getMaxClientCnxns());

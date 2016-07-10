@@ -88,6 +88,7 @@ public class ServerConfig {
      * @param config
      */
     public void readFrom(QuorumPeerConfig config) {
+      //standalone 模式下只需要这些配置就好了
       clientPortAddress = config.getClientPortAddress();
       dataDir = config.getDataDir();
       dataLogDir = config.getDataLogDir();

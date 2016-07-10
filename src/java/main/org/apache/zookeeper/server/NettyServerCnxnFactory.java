@@ -241,7 +241,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     }
     
     CnxnChannelHandler channelHandler = new CnxnChannelHandler();
-    
+    //based on netty version 3.7.0-Final
     NettyServerCnxnFactory() {
         bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
@@ -253,7 +253,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         bootstrap.setOption("child.tcpNoDelay", true);
         /* set socket linger to off, so that socket close does not block */
         bootstrap.setOption("child.soLinger", -1);
-
+        //设置channel handler
         bootstrap.getPipeline().addLast("servercnxnfactory", channelHandler);
     }
     
@@ -369,9 +369,11 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     @Override
     public void startup(ZooKeeperServer zks) throws IOException,
             InterruptedException {
+        //启动netty
         start();
         setZooKeeperServer(zks);
         zks.startdata();
+        //启动standalone zookeeper server
         zks.startup();
     }
 
