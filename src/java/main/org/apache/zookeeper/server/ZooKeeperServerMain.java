@@ -49,7 +49,9 @@ public class ZooKeeperServerMain {
     public static void main(String[] args) {
         ZooKeeperServerMain main = new ZooKeeperServerMain();
         try {
-            main.initializeAndRun(args);
+           //main.initializeAndRun(args);
+           //TODO for learn
+           main.initializeAndRun(new String[]{"/Users/jileng/openp/zookeeper-3.4.8/conf/zoo.cfg"});
         } catch (IllegalArgumentException e) {
             LOG.error("Invalid arguments, exiting abnormally", e);
             LOG.info(USAGE);

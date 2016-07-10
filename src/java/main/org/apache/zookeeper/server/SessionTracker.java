@@ -25,7 +25,7 @@ import org.apache.zookeeper.KeeperException.SessionExpiredException;
 import org.apache.zookeeper.KeeperException.SessionMovedException;
 
 /**
- * This is the basic interface that ZooKeeperServer uses to track sessions. The
+ * This is the basic interface that ZooKeeperServer uses to track(追踪) sessions. The
  * standalone and leader ZooKeeperServer use the same SessionTracker. The
  * FollowerZooKeeperServer uses a SessionTracker which is basically a simple
  * shell to track information to be forwarded to the leader.

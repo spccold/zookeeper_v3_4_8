@@ -77,8 +77,9 @@ public class FileTxnSnapLog {
      */
     public FileTxnSnapLog(File dataDir, File snapDir) throws IOException {
         LOG.debug("Opening datadir:{} snapDir:{}", dataDir, snapDir);
-
+        //dataLogDir
         this.dataDir = new File(dataDir, version + VERSION);
+        //dataDir
         this.snapDir = new File(snapDir, version + VERSION);
         if (!this.dataDir.exists()) {
             if (!this.dataDir.mkdirs()) {
