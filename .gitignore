@@ -1,8 +1,11 @@
+.DS_Store
 .classpath
 .eclipse/
 .project
 .revision/
 .settings/
+.svn/
+bin/
 build/
 src/c/generated/
 src/java/generated/
