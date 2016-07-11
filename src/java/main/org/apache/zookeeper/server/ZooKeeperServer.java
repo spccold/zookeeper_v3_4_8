@@ -277,6 +277,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             setZxid(zkDb.getDataTreeLastProcessedZxid());
         }
         else {
+            //zxid = zookeeper transaction id
             setZxid(zkDb.loadDataBase());
         }
         
