@@ -41,11 +41,11 @@ import org.apache.zookeeper.KeeperException.SessionExpiredException;
  */
 public class SessionTrackerImpl extends ZooKeeperCriticalThread implements SessionTracker {
     private static final Logger LOG = LoggerFactory.getLogger(SessionTrackerImpl.class);
-
+    //sessionId和session的映射关系
     HashMap<Long, SessionImpl> sessionsById = new HashMap<Long, SessionImpl>();
 
     HashMap<Long, SessionSet> sessionSets = new HashMap<Long, SessionSet>();
-
+    //存放当前server所维持的sessionId和对应的sessionTimeOut
     ConcurrentHashMap<Long, Integer> sessionsWithTimeout;
     long nextSessionId = 0;
     long nextExpirationTime;
@@ -96,6 +96,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
     {
         super("SessionTracker", listener);
         this.expirer = expirer;
+        //默认为一次tickTime
         this.expirationInterval = tickTime;
         this.sessionsWithTimeout = sessionsWithTimeout;
         nextExpirationTime = roundToInterval(System.currentTimeMillis());
@@ -240,6 +241,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
     synchronized public void addSession(long id, int sessionTimeout) {
         sessionsWithTimeout.put(id, sessionTimeout);
         if (sessionsById.get(id) == null) {
+            //创建会话实例
             SessionImpl s = new SessionImpl(id, sessionTimeout, 0);
             sessionsById.put(id, s);
             if (LOG.isTraceEnabled()) {

@@ -371,6 +371,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
             InterruptedException {
         //启动netty
         start();
+        //绑定当前实例到ZooKeeperServer
         setZooKeeperServer(zks);
         zks.startdata();
         //启动standalone zookeeper server

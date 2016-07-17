@@ -106,6 +106,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     protected int minSessionTimeout = -1;
     /** value of -1 indicates unset, use default */
     protected int maxSessionTimeout = -1;
+    //会话追踪器，检查client会话是否超时
     protected SessionTracker sessionTracker;
     private FileTxnSnapLog txnLogFactory = null;
     private ZKDatabase zkDb;
@@ -414,6 +415,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             createSessionTracker();
         }
         startSessionTracker();
+        //设置请求处理器链
         setupRequestProcessors();
 
         registerJMX();
@@ -571,6 +573,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         Random r = new Random(sessionId ^ superSecret);
         r.nextBytes(passwd);
         ByteBuffer to = ByteBuffer.allocate(4);
+        //最终的timeout写回client
         to.putInt(timeout);
         cnxn.setSessionId(sessionId);
         submitRequest(cnxn, sessionId, OpCode.createSession, 0, to, null);
@@ -697,6 +700,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             }
         }
         try {
+            //touch是为了保证什么呢?
             touch(si.cnxn);
             boolean validpacket = Request.isValid(si.type);
             if (validpacket) {
@@ -876,6 +880,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
         int sessionTimeout = connReq.getTimeOut();
         byte passwd[] = connReq.getPasswd();
+        //确定client端最终的sessionTimeOut
         int minSessionTimeout = getMinSessionTimeout();
         if (sessionTimeout < minSessionTimeout) {
             sessionTimeout = minSessionTimeout;
@@ -897,9 +902,10 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             serverCnxnFactory.closeSession(sessionId);
             cnxn.setSessionId(sessionId);
             reopenSession(cnxn, sessionId, passwd, sessionTimeout);
-        } else {
+        } else {//new connection from client
             LOG.info("Client attempting to establish new session at "
                     + cnxn.getRemoteSocketAddress());
+            //创建一个新的会话
             createSession(cnxn, passwd, sessionTimeout);
         }
     }

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class ClientCnxnSocketNIO extends ClientCnxnSocket {
     private static final Logger LOG = LoggerFactory
             .getLogger(ClientCnxnSocketNIO.class);
-
+    //nio 多路复用器
     private final Selector selector = Selector.open();
 
     private SelectionKey sockKey;
@@ -64,6 +64,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         if (sock == null) {
             throw new IOException("Socket is null!");
         }
+        //执行读操作
         if (sockKey.isReadable()) {
             int rc = sock.read(incomingBuffer);
             if (rc < 0) {
@@ -98,6 +99,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                 }
             }
         }
+        //执行写操作
         if (sockKey.isWritable()) {
             synchronized(outgoingQueue) {
                 Packet p = findSendablePacket(outgoingQueue,
@@ -261,6 +263,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         sock = SocketChannel.open();
         sock.configureBlocking(false);
         sock.socket().setSoLinger(false, -1);
+        //no delay
         sock.socket().setTcpNoDelay(true);
         return sock;
     }

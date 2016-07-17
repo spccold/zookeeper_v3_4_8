@@ -84,6 +84,7 @@ public final class StaticHostProvider implements HostProvider {
             throw new IllegalArgumentException(
                     "A HostProvider may not be empty!");
         }
+        //打乱初始化的zookeeper server集群,否则所有的zookeeper客户端实例可能全部连接到同一台服务器上
         Collections.shuffle(this.serverAddresses);
     }
 
@@ -96,6 +97,7 @@ public final class StaticHostProvider implements HostProvider {
         if (currentIndex == serverAddresses.size()) {
             currentIndex = 0;
         }
+        //一个圈之后, 如果发现host还是不可用,则睡眠spinDelay, 再继续选择host
         if (currentIndex == lastIndex && spinDelay > 0) {
             try {
                 Thread.sleep(spinDelay);

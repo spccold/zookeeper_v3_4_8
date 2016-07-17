@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -308,6 +307,7 @@ public class ClientCnxn {
                 }
                 baos.close();
                 this.bb = ByteBuffer.wrap(baos.toByteArray());
+                //覆盖之前的len
                 this.bb.putInt(this.bb.capacity() - 4);
                 this.bb.rewind();
             } catch (IOException e) {
@@ -347,7 +347,7 @@ public class ClientCnxn {
      *                the zookeeper object that this connection is related to.
      * @param watcher watcher for this connection
      * @param clientCnxnSocket
-     *                the socket implementation used (e.g. NIO/Netty)
+     *                the socket implementation used (e.g. NIO/Netty(netty not implementation in current version))
      * @param canBeReadOnly
      *                whether the connection is allowed to go to read-only
      *                mode in case of partitioning
@@ -392,8 +392,9 @@ public class ClientCnxn {
         this.sessionTimeout = sessionTimeout;
         this.hostProvider = hostProvider;
         this.chrootPath = chrootPath;
-
+        //这是基于什么考虑?
         connectTimeout = sessionTimeout / hostProvider.size();
+        //这是又是基于什么考虑?
         readTimeout = sessionTimeout * 2 / 3;
         readOnly = canBeReadOnly;
 
@@ -417,6 +418,7 @@ public class ClientCnxn {
         disableAutoWatchReset = b;
     }
     public void start() {
+        //启动线程
         sendThread.start();
         eventThread.start();
     }
@@ -878,8 +880,10 @@ public class ClientCnxn {
                      + ", initiating session");
             isFirstConnect = false;
             long sessId = (seenRwServerBefore) ? sessionId : 0;
+            //创建连接请求
             ConnectRequest conReq = new ConnectRequest(0, lastZxid,
                     sessionTimeout, sessId, sessionPasswd);
+            //向外请求的缓冲队列
             synchronized (outgoingQueue) {
                 // We add backwards since we are pushing into the front
                 // Only send if there's a pending watch
@@ -941,9 +945,11 @@ public class ClientCnxn {
                             OpCode.auth), null, new AuthPacket(0, id.scheme,
                             id.data), null, null));
                 }
+                //队列头部添加数据
                 outgoingQueue.addFirst(new Packet(null, null, conReq,
                             null, null, readOnly));
             }
+            //socket关注read and write events
             clientCnxnSocket.enableReadWriteOnly();
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Session establishment request sent on "
@@ -987,6 +993,7 @@ public class ClientCnxn {
         private boolean saslLoginFailed = false;
 
         private void startConnect() throws IOException {
+            //状态从not_connected过渡到connecting
             state = States.CONNECTING;
 
             InetSocketAddress addr;
@@ -994,6 +1001,7 @@ public class ClientCnxn {
                 addr = rwServerAddress;
                 rwServerAddress = null;
             } else {
+                //选择进行连接的host
                 addr = hostProvider.next(1000);
             }
 
@@ -1020,7 +1028,7 @@ public class ClientCnxn {
                 }
             }
             logStartConnect(addr);
-
+            //ClientCnxnSocketNIO(no netty implementation)
             clientCnxnSocket.connect(addr);
         }
 
@@ -1037,6 +1045,7 @@ public class ClientCnxn {
         
         @Override
         public void run() {
+            //初始化一系列变量
             clientCnxnSocket.introduce(this,sessionId);
             clientCnxnSocket.updateNow();
             clientCnxnSocket.updateLastSendAndHeard();
@@ -1046,6 +1055,7 @@ public class ClientCnxn {
             while (state.isAlive()) {
                 try {
                     if (!clientCnxnSocket.isConnected()) {
+                        //为啥以一次连接要睡眠一段时间呢?
                         if(!isFirstConnect){
                             try {
                                 Thread.sleep(r.nextInt(1000));
@@ -1057,6 +1067,7 @@ public class ClientCnxn {
                         if (closing || !state.isAlive()) {
                             break;
                         }
+                        //执行连接
                         startConnect();
                         clientCnxnSocket.updateLastSendAndHeard();
                     }
@@ -1137,7 +1148,7 @@ public class ClientCnxn {
                         }
                         to = Math.min(to, pingRwTimeout - idlePingRwServer);
                     }
-
+                    //doTransport
                     clientCnxnSocket.doTransport(to, pendingQueue, outgoingQueue, ClientCnxn.this);
                 } catch (Throwable e) {
                     if (closing) {
@@ -1384,7 +1395,7 @@ public class ClientCnxn {
     }
 
     private int xid = 1;
-
+    //client初始化处于未连接状态
     private volatile States state = States.NOT_CONNECTED;
 
     /*

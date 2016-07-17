@@ -731,6 +731,7 @@ public class NettyServerCnxn extends ServerCnxn {
                                         ChannelBuffers.copiedBuffer(dat)));
                     }
                     if (bb.remaining() == 0) {
+                        //一个完整的package才接收完成
                         packetReceived();
                         bb.flip();
 
@@ -739,6 +740,7 @@ public class NettyServerCnxn extends ServerCnxn {
                             throw new IOException("ZK down");
                         }
                         if (initialized) {
+                            //处理正常的消息包
                             zks.processPacket(this, bb);
 
                             if (zks.shouldThrottle(outstandingCount.incrementAndGet())) {
@@ -747,6 +749,7 @@ public class NettyServerCnxn extends ServerCnxn {
                         } else {
                             LOG.debug("got conn req request from "
                                     + getRemoteSocketAddress());
+                            //处理来自client的连接请求
                             zks.processConnectRequest(this, bb);
                             initialized = true;
                         }

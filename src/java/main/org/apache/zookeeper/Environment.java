@@ -18,13 +18,10 @@
 
 package org.apache.zookeeper;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provide insight into the runtime environment.
@@ -57,12 +54,14 @@ public class Environment {
         ArrayList<Entry> l = new ArrayList<Entry>();
         put(l, "zookeeper.version", Version.getFullVersion());
 
+        //maybe very slow sometimes
+        /*
         try {
             put(l, "host.name",
                 InetAddress.getLocalHost().getCanonicalHostName());
         } catch (UnknownHostException e) {
             put(l, "host.name", "<NA>");
-        }
+        }*/
 
         put(l, "java.version",
                 System.getProperty("java.version", "<NA>"));
