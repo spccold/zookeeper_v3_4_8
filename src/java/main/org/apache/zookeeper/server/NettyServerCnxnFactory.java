@@ -82,6 +82,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
                 LOG.trace("Channel connected " + e);
             }
             allChannels.add(ctx.getChannel());
+            //对于一个新的connection 服务端需要创建一个netty server connection
             NettyServerCnxn cnxn = new NettyServerCnxn(ctx.getChannel(),
                     zkServer, NettyServerCnxnFactory.this);
             ctx.setAttachment(cnxn);
@@ -210,6 +211,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
                             LOG.debug("Processed queue - bytes remaining");
                         }
                     } else {
+                        //接受客户端的消息
                         cnxn.receiveMessage(buf);
                         if (buf.readable()) {
                             if (LOG.isTraceEnabled()) {
@@ -390,7 +392,9 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
 
     private void addCnxn(NettyServerCnxn cnxn) {
         synchronized (cnxns) {
+            //所有连接
             cnxns.add(cnxn);
+            //同一台机器上，有多个tcp连接
             synchronized (ipMap){
                 InetAddress addr =
                     ((InetSocketAddress)cnxn.channel.getRemoteAddress())

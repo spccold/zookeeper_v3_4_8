@@ -124,7 +124,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * is more of a sanity check.
      */
     static final private long superSecret = 0XB3415C00L;
-
+    //当前zookeeper中正在处理的请求数
     private final AtomicInteger requestsInProcess = new AtomicInteger(0);
     final List<ChangeRecord> outstandingChanges = new ArrayList<ChangeRecord>();
     // this data structure must be accessed under the outstandingChanges lock
@@ -569,12 +569,14 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     }
 
     long createSession(ServerCnxn cnxn, byte passwd[], int timeout) {
+        //生成sessionId
         long sessionId = sessionTracker.createSession(timeout);
         Random r = new Random(sessionId ^ superSecret);
         r.nextBytes(passwd);
         ByteBuffer to = ByteBuffer.allocate(4);
         //最终的timeout写回client
         to.putInt(timeout);
+        //设置sessionId到当前的Server connection
         cnxn.setSessionId(sessionId);
         submitRequest(cnxn, sessionId, OpCode.createSession, 0, to, null);
         return sessionId;
@@ -609,7 +611,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             revalidateSession(cnxn, sessionId, sessionTimeout);
         }
     }
-
+    //完成 session的初始化
     public void finishSessionInit(ServerCnxn cnxn, boolean valid) {
         // register with JMX
         try {
@@ -893,6 +895,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         // We don't want to receive any packets until we are sure that the
         // session is setup
         cnxn.disableRecv();
+        //normal 0
         long sessionId = connReq.getSessionId();
         if (sessionId != 0) {
             long clientSessionId = connReq.getSessionId();

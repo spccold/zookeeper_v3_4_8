@@ -129,6 +129,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 if (Request.requestOfDeath == request) {
                     break;
                 }
+                //process request
                 pRequest(request);
             }
         } catch (RequestProcessorException e) {
@@ -676,6 +677,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 request.txn = new ErrorTxn(Code.MARSHALLINGERROR.intValue());
             }
         }
+        // 设置zookeeper transaction id
         request.zxid = zks.getZxid();
         nextProcessor.processRequest(request);
     }

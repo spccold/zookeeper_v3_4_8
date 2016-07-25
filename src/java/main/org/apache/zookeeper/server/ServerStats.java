@@ -23,10 +23,13 @@ package org.apache.zookeeper.server;
  * Basic Server Statistics
  */
 public class ServerStats {
+    //标识当前zookeeper server总体的packet发送量
     private long packetsSent;
+    //标识当前zookeeper server总体的packet接收量
     private long packetsReceived;
     private long maxLatency;
     private long minLatency = Long.MAX_VALUE;
+    //所有request处理耗时累加和
     private long totalLatency = 0;
     private long count = 0;
 

@@ -269,19 +269,23 @@ public abstract class ServerCnxn implements Stats, Watcher {
     protected abstract ServerStats serverStats();
     
     protected final Date established = new Date();
-
+    //标识当前tcp channel一共接收到多少个packet
     protected final AtomicLong packetsReceived = new AtomicLong();
+    //标识当前tcp channel一共发送了多少个packet
     protected final AtomicLong packetsSent = new AtomicLong();
-
+    //最快的处理
     protected long minLatency;
+    //最慢的处理
     protected long maxLatency;
     protected String lastOp;
     protected long lastCxid;
     protected long lastZxid;
     protected long lastResponseTime;
+    //最好一次request处理耗时
     protected long lastLatency;
 
     protected long count;
+    //当前单个tcp连接上的所有request处理耗时
     protected long totalLatency;
 
     public synchronized void resetStats() {

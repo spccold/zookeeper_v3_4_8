@@ -731,7 +731,7 @@ public class NettyServerCnxn extends ServerCnxn {
                                         ChannelBuffers.copiedBuffer(dat)));
                     }
                     if (bb.remaining() == 0) {
-                        //一个完整的package才接收完成
+                        //一个完整的packet接收完成
                         packetReceived();
                         bb.flip();
 
@@ -751,6 +751,7 @@ public class NettyServerCnxn extends ServerCnxn {
                                     + getRemoteSocketAddress());
                             //处理来自client的连接请求
                             zks.processConnectRequest(this, bb);
+                            //完成connect之后即完成初始化，之后都是正常的消息包
                             initialized = true;
                         }
                         bb = null;
@@ -767,13 +768,14 @@ public class NettyServerCnxn extends ServerCnxn {
                                 + ChannelBuffers.hexDump(
                                         ChannelBuffers.copiedBuffer(dat)));
                     }
-
+                    
                     if (message.readableBytes() < bbLen.remaining()) {
                         bbLen.limit(bbLen.position() + message.readableBytes());
                     }
                     message.readBytes(bbLen);
+                    //确保读取消息长度的正确性,不要超过了4个字节
                     bbLen.limit(bbLen.capacity());
-                    if (bbLen.remaining() == 0) {
+                    if (bbLen.remaining() == 0) {//确保读取到完整的4个字节
                         bbLen.flip();
 
                         if (LOG.isTraceEnabled()) {

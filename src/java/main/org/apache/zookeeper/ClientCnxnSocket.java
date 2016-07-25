@@ -59,6 +59,7 @@ abstract class ClientCnxnSocket {
     protected long recvCount = 0;
     protected long lastHeard;
     protected long lastSend;
+    //for what?
     protected long now;
     protected ClientCnxn.SendThread sendThread;
 

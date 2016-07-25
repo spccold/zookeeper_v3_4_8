@@ -87,7 +87,7 @@ public abstract class ServerCnxnFactory {
     public abstract void start();
 
     protected ZooKeeperServer zkServer;
-    // 在ZooKeeperServer和ServerCnxnFactory之间建立相互饮用
+    // 在ZooKeeperServer和ServerCnxnFactory之间建立相互引用
     final public void setZooKeeperServer(ZooKeeperServer zk) {
         this.zkServer = zk;
         if (zk != null) {

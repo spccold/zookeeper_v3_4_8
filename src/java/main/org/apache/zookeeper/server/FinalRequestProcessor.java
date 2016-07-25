@@ -168,6 +168,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                 return;
             }
             case OpCode.createSession: {
+                //更新当前request处理耗时
                 zks.serverStats().updateLatency(request.createTime);
 
                 lastOp = "SESS";

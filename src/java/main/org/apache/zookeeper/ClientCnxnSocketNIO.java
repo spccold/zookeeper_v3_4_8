@@ -361,8 +361,8 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         updateNow();
         for (SelectionKey k : selected) {
             SocketChannel sc = ((SocketChannel) k.channel());
-            if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {
-                if (sc.finishConnect()) {
+            if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {//发生于connect返回false， not immediate connect 
+                if (sc.finishConnect()) {//no-blocking模式下，可能会连接多次
                     updateLastSendAndHeard();
                     sendThread.primeConnection();
                 }

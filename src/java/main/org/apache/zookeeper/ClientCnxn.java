@@ -356,6 +356,7 @@ public class ClientCnxn {
     public ClientCnxn(String chrootPath, HostProvider hostProvider, int sessionTimeout, ZooKeeper zooKeeper,
             ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)
             throws IOException {
+        //默认的sessionId为0， sessionPasswd为 empty byte array
         this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
              clientCnxnSocket, 0, new byte[16], canBeReadOnly);
     }
@@ -873,7 +874,7 @@ public class ClientCnxn {
         ClientCnxnSocket getClientCnxnSocket() {
             return clientCnxnSocket;
         }
-
+        //准备好connection
         void primeConnection() throws IOException {
             LOG.info("Socket connection established to "
                      + clientCnxnSocket.getRemoteSocketAddress()
@@ -1046,6 +1047,7 @@ public class ClientCnxn {
         @Override
         public void run() {
             //初始化一系列变量
+            //sessionId初始为0
             clientCnxnSocket.introduce(this,sessionId);
             clientCnxnSocket.updateNow();
             clientCnxnSocket.updateLastSendAndHeard();
@@ -1055,7 +1057,6 @@ public class ClientCnxn {
             while (state.isAlive()) {
                 try {
                     if (!clientCnxnSocket.isConnected()) {
-                        //为啥以一次连接要睡眠一段时间呢?
                         if(!isFirstConnect){
                             try {
                                 Thread.sleep(r.nextInt(1000));
@@ -1273,7 +1274,7 @@ public class ClientCnxn {
          * Callback invoked by the ClientCnxnSocket once a connection has been
          * established.
          * 
-         * @param _negotiatedSessionTimeout
+         * @param _negotiatedSessionTimeout 和服务端谈判后的sessionTimeOuts
          * @param _sessionId
          * @param _sessionPasswd
          * @param isRO
@@ -1308,6 +1309,7 @@ public class ClientCnxn {
             //改变状态为connected
             state = (isRO) ?
                     States.CONNECTEDREADONLY : States.CONNECTED;
+            //yes
             seenRwServerBefore |= !isRO;
             LOG.info("Session establishment complete on server "
                     + clientCnxnSocket.getRemoteSocketAddress()
