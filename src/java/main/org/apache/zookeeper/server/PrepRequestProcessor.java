@@ -534,7 +534,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         // request.type + " id = 0x" + Long.toHexString(request.sessionId));
         request.hdr = null;
         request.txn = null;
-        
+        //只有涉及修改的opt才会增长zookeeper server的zxid(by call getNextZxid())
         try {
             switch (request.type) {
                 case OpCode.create:

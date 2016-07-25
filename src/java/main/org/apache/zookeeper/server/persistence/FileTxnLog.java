@@ -314,7 +314,7 @@ public class FileTxnLog implements TxnLog {
     }
 
     /**
-     * commit the logs. make sure that evertyhing hits the
+     * commit the logs. make sure that everything hits the
      * disk
      */
     public synchronized void commit() throws IOException {

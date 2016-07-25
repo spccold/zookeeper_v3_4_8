@@ -1417,6 +1417,7 @@ public class ClientCnxn {
         Packet packet = queuePacket(h, r, request, response, null, null, null,
                     null, watchRegistration);
         synchronized (packet) {
+            //avoid spurious wakeups 
             while (!packet.finished) {
                 packet.wait();
             }

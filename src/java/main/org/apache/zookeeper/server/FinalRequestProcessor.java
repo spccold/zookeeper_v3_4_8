@@ -388,7 +388,7 @@ public class FinalRequestProcessor implements RequestProcessor {
             LOG.error("Dumping request buffer: 0x" + sb.toString());
             err = Code.MARSHALLINGERROR;
         }
-
+        //lastZxid?
         long lastZxid = zks.getZKDatabase().getDataTreeLastProcessedZxid();
         ReplyHeader hdr =
             new ReplyHeader(request.cxid, lastZxid, err.intValue());

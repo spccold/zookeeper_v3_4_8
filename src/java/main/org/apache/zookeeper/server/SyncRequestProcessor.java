@@ -127,6 +127,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                     si = queuedRequests.take();
                 } else {
                     si = queuedRequests.poll();
+                    //没有正常的请求，就处理flush tasks
                     if (si == null) {
                         flush(toFlush);
                         continue;
@@ -160,7 +161,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
                             }
                             logCount = 0;
                         }
-                    } else if (toFlush.isEmpty()) {
+                    } else if (toFlush.isEmpty()) {//怎么判断这是一个读操作?
                         // optimization for read heavy workloads
                         // iff this is a read, and there are no pending
                         // flushes (writes), then just pass this to the next

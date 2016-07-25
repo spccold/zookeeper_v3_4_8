@@ -78,7 +78,7 @@ public class DataTree {
      * This hashtable provides a fast lookup to the datanodes. The tree is the
      * source of truth and is where all the locking occurs
      */
-    private final ConcurrentHashMap<String, DataNode> nodes =
+    private final ConcurrentHashMap<String  /*full path, eg: /zookeeper/quota */, DataNode> nodes =
         new ConcurrentHashMap<String, DataNode>();
 
     private final WatchManager dataWatches = new WatchManager();
@@ -301,10 +301,13 @@ public class DataTree {
         nodes.put(rootZookeeper, root);
 
         /** add the proc node and quota node */
+        // zookeeper
         root.addChild(procChildZookeeper);
+        // /zookeeper
         nodes.put(procZookeeper, procDataNode);
-
+        //quota
         procDataNode.addChild(quotaChildZookeeper);
+        // /zookeeper/quota
         nodes.put(quotaZookeeper, quotaDataNode);
     }
 

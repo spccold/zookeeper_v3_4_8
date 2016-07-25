@@ -93,6 +93,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                     updateLastHeard();
                     initialized = true;
                 } else {
+                    //读取正常的response
                     sendThread.readResponse(incomingBuffer);
                     lenBuffer.clear();
                     incomingBuffer = lenBuffer;
@@ -113,6 +114,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                         if ((p.requestHeader != null) &&
                                 (p.requestHeader.getType() != OpCode.ping) &&
                                 (p.requestHeader.getType() != OpCode.auth)) {
+                            //increase by one
                             p.requestHeader.setXid(cnxn.getXid());
                         }
                         p.createBB();
@@ -125,6 +127,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                                 && p.requestHeader.getType() != OpCode.ping
                                 && p.requestHeader.getType() != OpCode.auth) {
                             synchronized (pendingQueue) {
+                                //添加到pendingQueue
                                 pendingQueue.add(p);
                             }
                         }
