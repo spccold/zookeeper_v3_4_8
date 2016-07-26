@@ -142,7 +142,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         }
         LOG.info("PrepRequestProcessor exited loop!");
     }
-
+    //所为何事?
     ChangeRecord getRecordForPath(String path) throws KeeperException.NoNodeException {
         ChangeRecord lastChange = null;
         synchronized (zks.outstandingChanges) {
@@ -156,6 +156,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                         acl = n.acl;
                         children = n.getChildren();
                     }
+                    //获取last change
                     lastChange = new ChangeRecord(-1, path, n.stat,
                         children != null ? children.size() : 0,
                             zks.getZKDatabase().convertLong(acl));
@@ -329,6 +330,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 CreateRequest createRequest = (CreateRequest)record;   
                 if(deserialize)
                     ByteBufferInputStream.byteBuffer2Record(request.request, createRequest);
+                //full path
                 String path = createRequest.getPath();
                 int lastSlash = path.lastIndexOf('/');
                 if (lastSlash == -1 || path.indexOf('\0') != -1 || failCreate) {
@@ -337,6 +339,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                     throw new KeeperException.BadArgumentsException(path);
                 }
                 List<ACL> listACL = removeDuplicates(createRequest.getAcl());
+                //authInfo怎么来的?
                 if (!fixupACL(request.authInfo, listACL)) {
                     throw new KeeperException.InvalidACLException(path);
                 }
@@ -363,6 +366,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 if (ephemeralParent) {
                     throw new KeeperException.NoChildrenForEphemeralsException(path);
                 }
+                //The number of changes to the children of this znode increase one
                 int newCversion = parentRecord.stat.getCversion()+1;
                 request.txn = new CreateTxn(path, createRequest.getData(),
                         listACL,
@@ -374,6 +378,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 parentRecord = parentRecord.duplicate(request.hdr.getZxid());
                 parentRecord.childCount++;
                 parentRecord.stat.setCversion(newCversion);
+                //add change record
                 addChangeRecord(parentRecord);
                 addChangeRecord(new ChangeRecord(request.hdr.getZxid(), path, s,
                         0, listACL));
@@ -681,9 +686,8 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         request.zxid = zks.getZxid();
         nextProcessor.processRequest(request);
     }
-
+    //这个为啥不在客户端做掉?
     private List<ACL> removeDuplicates(List<ACL> acl) {
-
         ArrayList<ACL> retval = new ArrayList<ACL>();
         Iterator<ACL> it = acl.iterator();
         while (it.hasNext()) {

@@ -49,7 +49,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
     ConcurrentHashMap<Long, Integer> sessionsWithTimeout;
     long nextSessionId = 0;
     long nextExpirationTime;
-
+    //默认为一次tick time
     int expirationInterval;
 
     public static class SessionImpl implements Session {

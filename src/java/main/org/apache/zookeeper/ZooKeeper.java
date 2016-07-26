@@ -764,8 +764,9 @@ public class ZooKeeper {
         throws KeeperException, InterruptedException
     {
         final String clientPath = path;
+        //append '1' when is sequential
         PathUtils.validatePath(clientPath, createMode.isSequential());
-
+        //full path store in datatree
         final String serverPath = prependChroot(clientPath);
 
         RequestHeader h = new RequestHeader();
@@ -773,6 +774,7 @@ public class ZooKeeper {
         CreateRequest request = new CreateRequest();
         CreateResponse response = new CreateResponse();
         request.setData(data);
+        //Znode的类型
         request.setFlags(createMode.toFlag());
         request.setPath(serverPath);
         if (acl != null && acl.size() == 0) {
