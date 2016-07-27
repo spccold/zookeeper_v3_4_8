@@ -764,7 +764,6 @@ public class ZooKeeper {
         throws KeeperException, InterruptedException
     {
         final String clientPath = path;
-        //append '1' when is sequential
         PathUtils.validatePath(clientPath, createMode.isSequential());
         //full path store in datatree
         final String serverPath = prependChroot(clientPath);

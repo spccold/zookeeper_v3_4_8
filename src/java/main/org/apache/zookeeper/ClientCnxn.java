@@ -946,7 +946,9 @@ public class ClientCnxn {
                             OpCode.auth), null, new AuthPacket(0, id.scheme,
                             id.data), null, null));
                 }
-                //队列头部添加数据
+                //队列头部添加数据,注意正常的packet添加在队尾, 主要因为session创建的过程异步的
+                //session创建成功之前，zookeeper实例上可能已经执行相关action，对应的packet已经添加到队尾
+                //session创建成功前，任何packet不允许发送到server，所以把session创建的packet放在队头
                 outgoingQueue.addFirst(new Packet(null, null, conReq,
                             null, null, readOnly));
             }
@@ -1056,7 +1058,7 @@ public class ClientCnxn {
             final int MAX_SEND_PING_INTERVAL = 10000; //10 seconds
             while (state.isAlive()) {
                 try {
-                    if (!clientCnxnSocket.isConnected()) {
+                    if (!clientCnxnSocket.isConnected()) {// sockKey != null
                         if(!isFirstConnect){
                             try {
                                 Thread.sleep(r.nextInt(1000));
@@ -1469,6 +1471,7 @@ public class ClientCnxn {
                 if (h.getType() == OpCode.closeSession) {
                     closing = true;
                 }
+                //在队尾部添加package
                 outgoingQueue.add(packet);
             }
         }
