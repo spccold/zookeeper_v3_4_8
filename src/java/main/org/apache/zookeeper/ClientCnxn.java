@@ -1008,15 +1008,11 @@ public class ClientCnxn {
                 addr = hostProvider.next(1000);
             }
 
-            setName(getName().replaceAll("\\(.*\\)",
-                    "(" + addr.getHostName() + ":" + addr.getPort() + ")"));
+            setName(getName().replaceAll("\\(.*\\)","(" + addr.getHostName() + ":" + addr.getPort() + ")"));
             if (ZooKeeperSaslClient.isEnabled()) {
                 try {
-                    String principalUserName = System.getProperty(
-                            ZK_SASL_CLIENT_USERNAME, "zookeeper");
-                    zooKeeperSaslClient =
-                        new ZooKeeperSaslClient(
-                                principalUserName+"/"+addr.getHostName());
+                    String principalUserName = System.getProperty(ZK_SASL_CLIENT_USERNAME, "zookeeper");
+                    zooKeeperSaslClient =new ZooKeeperSaslClient(principalUserName+"/"+addr.getHostName());
                 } catch (LoginException e) {
                     // An authentication error occurred when the SASL client tried to initialize:
                     // for Kerberos this means that the client failed to authenticate with the KDC.

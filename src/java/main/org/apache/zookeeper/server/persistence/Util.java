@@ -200,11 +200,11 @@ public class Util {
 
     /**
      * Grows the file to the specified number of bytes. This only happenes if 
-     * the current file position is sufficiently close (less than 4K) to end of 
+     * the current file position is sufficiently close (less than 4K(单个page cahce的大小)) to end of 
      * file. 
      * 
      * @param f output stream to pad
-     * @param currentSize application keeps track of the cuurent file size
+     * @param currentSize application keeps track of the current file size
      * @param preAllocSize how many bytes to pad
      * @return the new file size. It can be the same as currentSize if no
      * padding was done.
@@ -216,6 +216,7 @@ public class Util {
         if (position + 4096 >= currentSize) {
             currentSize = currentSize + preAllocSize;
             fill.position(0);
+            //预申请文件空间
             f.getChannel().write(fill, currentSize-fill.remaining());
         }
         return currentSize;
@@ -274,7 +275,9 @@ public class Util {
      */
     public static void writeTxnBytes(OutputArchive oa, byte[] bytes)
             throws IOException {
+        //先写buffer长度, 再写buffer的内容
         oa.writeBuffer(bytes, "txnEntry");
+        //EOR = End Of Record
         oa.writeByte((byte) 0x42, "EOR"); // 'B'
     }
     

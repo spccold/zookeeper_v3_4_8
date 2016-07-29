@@ -162,7 +162,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         }
         LOG.info("SessionTrackerImpl exited loop!");
     }
-
+    //保持session新鲜
     synchronized public boolean touchSession(long sessionId, int timeout) {
         if (LOG.isTraceEnabled()) {
             ZooTrace.logTraceMessage(LOG,
@@ -175,6 +175,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         if (s == null || s.isClosing()) {
             return false;
         }
+        //使session保持新鲜
         long expireTime = roundToInterval(System.currentTimeMillis() + timeout);
         if (s.tickTime >= expireTime) {
             // Nothing needs to be done
@@ -234,6 +235,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
 
 
     synchronized public long createSession(int sessionTimeout) {
+        //nextSessionId 
         addSession(nextSessionId, sessionTimeout);
         return nextSessionId++;
     }

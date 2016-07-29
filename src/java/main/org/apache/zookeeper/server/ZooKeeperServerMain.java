@@ -103,16 +103,14 @@ public class ZooKeeperServerMain {
             // create a file logger url from the command line args
             ZooKeeperServer zkServer = new ZooKeeperServer();
 
-            txnLog = new FileTxnSnapLog(new File(config.dataLogDir), new File(
-                    config.dataDir));
+            txnLog = new FileTxnSnapLog(new File(config.dataLogDir), new File(config.dataDir));
             zkServer.setTxnLogFactory(txnLog);
             zkServer.setTickTime(config.tickTime);
             zkServer.setMinSessionTimeout(config.minSessionTimeout);
             zkServer.setMaxSessionTimeout(config.maxSessionTimeout);
             //use netty or nio in jdk directly(since zookeeper 3.4)
             cnxnFactory = ServerCnxnFactory.createFactory();
-            cnxnFactory.configure(config.getClientPortAddress(),
-                    config.getMaxClientCnxns());
+            cnxnFactory.configure(config.getClientPortAddress(), config.getMaxClientCnxns());
             cnxnFactory.startup(zkServer);
             cnxnFactory.join();
             if (zkServer.isRunning()) {

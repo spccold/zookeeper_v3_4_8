@@ -71,7 +71,7 @@ public class Request {
     public long zxid = -1;
 
     public final List<Id> authInfo;
-
+    //标识当前request创建时间，用于zookeeper统计处理延时
     public final long createTime = System.currentTimeMillis();
     
     private Object owner;

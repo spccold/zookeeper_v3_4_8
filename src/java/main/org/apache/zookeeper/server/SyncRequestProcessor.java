@@ -67,7 +67,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements Req
     private static int snapCount = ZooKeeperServer.getSnapCount();
     
     /**
-     * The number of log entries before rolling the log, number
+     * The number of log entries(log entry即一条完整的log) before rolling the log, number
      * is chosen randomly
      */
     private static int randRoll;

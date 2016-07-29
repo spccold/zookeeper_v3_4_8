@@ -67,7 +67,8 @@ import org.slf4j.LoggerFactory;
  *     checksum Txnlen TxnHeader Record 0x42
  * 
  * checksum: 8bytes Adler32 is currently used
- *   calculated across payload -- Txnlen, TxnHeader, Record and 0x42
+ *   //calculated across payload -- Txnlen, TxnHeader, Record and 0x42
+ *   calculated across payload -- TxnHeader, Record
  * 
  * Txnlen:
  *     len 4bytes
@@ -89,7 +90,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileTxnLog implements TxnLog {
     private static final Logger LOG;
-
+    //64kb
     static long preAllocSize =  65536 * 1024;
 
     public final static int TXNLOG_MAGIC =
@@ -122,8 +123,8 @@ public class FileTxnLog implements TxnLog {
     File logDir;
     private final boolean forceSync = !System.getProperty("zookeeper.forceSync", "yes").equals("no");;
     long dbId;
-    private LinkedList<FileOutputStream> streamsToFlush =
-        new LinkedList<FileOutputStream>();
+    //代刷新的FileOutputStream
+    private LinkedList<FileOutputStream> streamsToFlush = new LinkedList<FileOutputStream>();
     long currentSize;
     File logFileWrite = null;
 
@@ -199,11 +200,11 @@ public class FileTxnLog implements TxnLog {
                     LOG.info("Creating new log file: log." +  
                             Long.toHexString(hdr.getZxid()));
                }
-               
-               logFileWrite = new File(logDir, ("log." + 
-                       Long.toHexString(hdr.getZxid())));
+               //stream构建
+               logFileWrite = new File(logDir, ("log." + Long.toHexString(hdr.getZxid())));
                fos = new FileOutputStream(logFileWrite);
                logStream=new BufferedOutputStream(fos);
+               
                oa = BinaryOutputArchive.getArchive(logStream);
                FileHeader fhdr = new FileHeader(TXNLOG_MAGIC,VERSION, dbId);
                fhdr.serialize(oa, "fileheader");
@@ -218,9 +219,12 @@ public class FileTxnLog implements TxnLog {
                 throw new IOException("Faulty serialization for header " +
                         "and txn");
             }
+            //为啥每次创建一个Adler32?  真的有必要?
             Checksum crc = makeChecksumAlgorithm();
             crc.update(buf, 0, buf.length);
+            //1.先写crc
             oa.writeLong(crc.getValue(), "txnEntryCRC");
+            //2.再写TxnHeader and XXXTxn
             Util.writeTxnBytes(oa, buf);
             
             return true;
