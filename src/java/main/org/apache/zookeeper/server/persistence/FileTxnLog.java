@@ -329,7 +329,7 @@ public class FileTxnLog implements TxnLog {
             log.flush();
             if (forceSync) {
                 long startSyncNS = System.nanoTime();
-
+                //it need only force content changes to be written
                 log.getChannel().force(false);
 
                 long syncElapsedMS =
