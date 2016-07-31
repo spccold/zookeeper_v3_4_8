@@ -98,7 +98,7 @@ public class ZooKeeper {
     public ZooKeeperSaslClient getSaslClient() {
         return cnxn.zooKeeperSaslClient;
     }
-
+    //观察者管理器
     private final ZKWatchManager watchManager = new ZKWatchManager();
 
     List<String> getDataWatches() {
@@ -134,7 +134,7 @@ public class ZooKeeper {
             new HashMap<String, Set<Watcher>>();
         private final Map<String, Set<Watcher>> childWatches =
             new HashMap<String, Set<Watcher>>();
-
+        //默认的观察者
         private volatile Watcher defaultWatcher;
 
         final private void addTo(Set<Watcher> from, Set<Watcher> to) {

@@ -466,8 +466,7 @@ public class ClientCnxn {
         }
 
         public void queueEvent(WatchedEvent event) {
-            if (event.getType() == EventType.None
-                    && sessionState == event.getState()) {
+            if (event.getType() == EventType.None && sessionState == event.getState()) {
                 return;
             }
             sessionState = event.getState();
@@ -778,6 +777,7 @@ public class ClientCnxn {
                     if(serverPath.compareTo(chrootPath)==0)
                         event.setPath("/");
                     else if (serverPath.length() > chrootPath.length())
+                        //client端path不是全路径
                         event.setPath(serverPath.substring(chrootPath.length()));
                     else {
                     	LOG.warn("Got server path " + event.getPath()

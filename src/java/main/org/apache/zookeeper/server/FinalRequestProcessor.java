@@ -263,8 +263,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                 if (path.indexOf('\0') != -1) {
                     throw new KeeperException.BadArgumentsException();
                 }
-                Stat stat = zks.getZKDatabase().statNode(path, existsRequest
-                        .getWatch() ? cnxn : null);
+                Stat stat = zks.getZKDatabase().statNode(path, existsRequest.getWatch() ? cnxn : null);
                 rsp = new ExistsResponse(stat);
                 break;
             }
