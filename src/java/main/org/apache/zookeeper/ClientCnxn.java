@@ -1474,7 +1474,12 @@ public class ClientCnxn {
         sendThread.getClientCnxnSocket().wakeupCnxn();
         return packet;
     }
-
+    /**
+     * 向当前所建立的Cnxn上添加授权信息，方便后面操作DataNode时的权限验证
+     * 
+     * @param scheme
+     * @param auth
+     */
     public void addAuthInfo(String scheme, byte auth[]) {
         if (!state.isAlive()) {
             return;

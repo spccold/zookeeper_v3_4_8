@@ -112,21 +112,18 @@ public class DataTree {
     /**
      * This hashtable lists the paths of the ephemeral nodes of a session.
      */
-    private final Map<Long, HashSet<String>> ephemerals =
-        new ConcurrentHashMap<Long, HashSet<String>>();
+    private final Map<Long, HashSet<String>> ephemerals = new ConcurrentHashMap<Long, HashSet<String>>();
 
     /**
      * this is map from longs to acl's. It saves acl's being stored for each
      * datanode.
      */
-    public final Map<Long, List<ACL>> longKeyMap =
-        new HashMap<Long, List<ACL>>();
+    public final Map<Long, List<ACL>> longKeyMap = new HashMap<Long, List<ACL>>();
 
     /**
      * this a map from acls to long.
      */
-    public final Map<List<ACL>, Long> aclKeyMap =
-        new HashMap<List<ACL>, Long>();
+    public final Map<List<ACL>, Long> aclKeyMap = new HashMap<List<ACL>, Long>();
 
     /**
      * these are the number of acls that we have in the datatree
@@ -457,15 +454,21 @@ public class DataTree {
             throws KeeperException.NoNodeException,
             KeeperException.NodeExistsException {
         int lastSlash = path.lastIndexOf('/');
+        //parent
         String parentName = path.substring(0, lastSlash);
+        //child
         String childName = path.substring(lastSlash + 1);
         StatPersisted stat = new StatPersisted();
+        //设置node的创建时间以及最后修改时间
         stat.setCtime(time);
         stat.setMtime(time);
+        //创建，最后修改的zxid，children最后被修改的zxid
         stat.setCzxid(zxid);
         stat.setMzxid(zxid);
         stat.setPzxid(zxid);
+        //设置当前node的版本
         stat.setVersion(0);
+        //设置acl list的版本
         stat.setAversion(0);
         stat.setEphemeralOwner(ephemeralOwner);
         DataNode parent = nodes.get(parentName);
@@ -475,6 +478,7 @@ public class DataTree {
         synchronized (parent) {
             Set<String> children = parent.getChildren();
             if (children != null) {
+                //node exist
                 if (children.contains(childName)) {
                     throw new KeeperException.NodeExistsException();
                 }

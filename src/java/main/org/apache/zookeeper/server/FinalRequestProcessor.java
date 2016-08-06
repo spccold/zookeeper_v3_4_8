@@ -93,6 +93,8 @@ public class FinalRequestProcessor implements RequestProcessor {
         }
         ProcessTxnResult rc = null;
         synchronized (zks.outstandingChanges) {
+            //////////////////=================
+            //防止DataTree更新出现脏数据
             while (!zks.outstandingChanges.isEmpty()
                     && zks.outstandingChanges.get(0).zxid <= request.zxid) {
                 ChangeRecord cr = zks.outstandingChanges.remove(0);
@@ -105,6 +107,8 @@ public class FinalRequestProcessor implements RequestProcessor {
                     zks.outstandingChangesForPath.remove(cr.path);
                 }
             }
+            //////////////////=================
+            
             if (request.hdr != null) {
                TxnHeader hdr = request.hdr;
                Record txn = request.txn;

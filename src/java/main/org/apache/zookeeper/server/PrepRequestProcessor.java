@@ -373,6 +373,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 if (createMode.isEphemeral()) {
                     s.setEphemeralOwner(request.sessionId);
                 }
+                //这里为什么要duplicate?
                 parentRecord = parentRecord.duplicate(request.hdr.getZxid());
                 parentRecord.childCount++;
                 parentRecord.stat.setCversion(newCversion);

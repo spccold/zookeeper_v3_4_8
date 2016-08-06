@@ -224,7 +224,7 @@ public class FileTxnLog implements TxnLog {
             crc.update(buf, 0, buf.length);
             //1.先写crc
             oa.writeLong(crc.getValue(), "txnEntryCRC");
-            //2.再写TxnHeader and XXXTxn
+            //2.再写len , TxnHeader ,XXXTxn, EOR
             Util.writeTxnBytes(oa, buf);
             
             return true;
