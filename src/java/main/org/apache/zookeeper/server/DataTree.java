@@ -777,7 +777,7 @@ public class DataTree {
         }
 
     }
-
+    //最后一次处理的zookeeper transaction id
     public volatile long lastProcessedZxid = 0;
 
     public ProcessTxnResult processTxn(TxnHeader header, Record txn)
@@ -787,6 +787,7 @@ public class DataTree {
         try {
             rc.clientId = header.getClientId();
             rc.cxid = header.getCxid();
+            //最后一次修改的zookeeper transaction id
             rc.zxid = header.getZxid();
             rc.type = header.getType();
             rc.err = 0;

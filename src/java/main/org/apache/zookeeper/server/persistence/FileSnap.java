@@ -75,6 +75,7 @@ public class FileSnap implements SnapShot {
         }
         File snap = null;
         boolean foundValid = false;
+        //先获取最新的snapshot
         for (int i = 0; i < snapList.size(); i++) {
             snap = snapList.get(i);
             InputStream snapIS = null;
@@ -87,9 +88,11 @@ public class FileSnap implements SnapShot {
                 deserialize(dt,sessions, ia);
                 long checkSum = crcIn.getChecksum().getValue();
                 long val = ia.readLong("val");
+                //CRC验证snapshot是否完整
                 if (val != checkSum) {
                     throw new IOException("CRC corruption in snapshot :  " + snap);
                 }
+                //成功后，就不必再读取旧的snapshot文件
                 foundValid = true;
                 break;
             } catch(IOException e) {
@@ -104,6 +107,7 @@ public class FileSnap implements SnapShot {
         if (!foundValid) {
             throw new IOException("Not able to find valid snapshots in " + snapDir);
         }
+        //获取当前snapshot所关联的last zookeeper transaction id
         dt.lastProcessedZxid = Util.getZxidFromName(snap.getName(), "snapshot");
         return dt.lastProcessedZxid;
     }
@@ -154,6 +158,7 @@ public class FileSnap implements SnapShot {
     private List<File> findNValidSnapshots(int n) throws IOException {
         List<File> files = Util.sortDataDir(snapDir.listFiles(),"snapshot", false);
         int count = 0;
+        //最新的snapshot会最先出现
         List<File> list = new ArrayList<File>();
         for (File f : files) {
             // we should catch the exceptions
@@ -209,6 +214,7 @@ public class FileSnap implements SnapShot {
         if(header==null)
             throw new IllegalStateException(
                     "Snapshot's not open for writing: uninitialized header");
+        //先写snapshot header
         header.serialize(oa, "fileheader");
         SerializeUtils.serializeSnapshot(dt,oa,sessions);
     }

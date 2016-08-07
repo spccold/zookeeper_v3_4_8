@@ -167,6 +167,7 @@ public class Util {
         try {
             // including the header and the last / bytes
             // the snapshot should be atleast 10 bytes
+            //看不懂啊!，为啥是10个字节呢
             if (raf.length() < 10) {
                 return false;
             }
@@ -200,7 +201,7 @@ public class Util {
 
     /**
      * Grows the file to the specified number of bytes. This only happenes if 
-     * the current file position is sufficiently close (less than 4K(单个page cahce的大小)) to end of 
+     * the current file position is sufficiently close (less than 4K(单个page cahce/block的大小)) to end of 
      * file. 
      * 
      * @param f output stream to pad
@@ -216,7 +217,7 @@ public class Util {
         if (position + 4096 >= currentSize) {
             currentSize = currentSize + preAllocSize;
             fill.position(0);
-            //预申请文件空间
+            //预申请文件空间, 保证后续的io是顺序的，顺序io效率必随机io高
             f.getChannel().write(fill, currentSize-fill.remaining());
         }
         return currentSize;

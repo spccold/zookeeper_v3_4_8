@@ -66,7 +66,7 @@ public class BinaryOutputArchive implements OutputArchive {
     public void writeDouble(double d, String tag) throws IOException {
         out.writeDouble(d);
     }
-    
+
     /**
      * create our own char encoder to utf8. This is faster 
      * then string.getbytes(UTF8).

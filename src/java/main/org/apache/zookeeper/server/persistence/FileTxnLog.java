@@ -90,7 +90,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileTxnLog implements TxnLog {
     private static final Logger LOG;
-    //64kb
+    //64MB
     static long preAllocSize =  65536 * 1024;
 
     public final static int TXNLOG_MAGIC =
@@ -201,6 +201,7 @@ public class FileTxnLog implements TxnLog {
                             Long.toHexString(hdr.getZxid()));
                }
                //stream构建
+               //filename log.zxid
                logFileWrite = new File(logDir, ("log." + Long.toHexString(hdr.getZxid())));
                fos = new FileOutputStream(logFileWrite);
                logStream=new BufferedOutputStream(fos);
@@ -242,7 +243,7 @@ public class FileTxnLog implements TxnLog {
     }
 
     /**
-     * Find the log file that starts at, or just before, the snapshot. Return
+     * Find the log file that starts at, or just before(值得理解), the snapshot. Return
      * this and all subsequent logs. Results are ordered by zxid of file,
      * ascending order.
      * @param logDirList array of files
@@ -538,6 +539,7 @@ public class FileTxnLog implements TxnLog {
          */
         void init() throws IOException {
             storedFiles = new ArrayList<File>();
+            //很奇怪这里为啥传入zxid呢?为啥从0开始
             List<File> files = Util.sortDataDir(FileTxnLog.getLogFiles(logDir.listFiles(), 0), "log", false);
             for (File f: files) {
                 if (Util.getZxidFromName(f.getName(), "log") >= zxid) {
@@ -552,6 +554,7 @@ public class FileTxnLog implements TxnLog {
             goToNextLog();
             if (!next())
                 return;
+            //找到日志执行的具体位置
             while (hdr.getZxid() < zxid) {
                 if (!next())
                     return;
@@ -628,6 +631,7 @@ public class FileTxnLog implements TxnLog {
                 long crcValue = ia.readLong("crcvalue");
                 byte[] bytes = Util.readTxnBytes(ia);
                 // Since we preallocate, we define EOF to be an
+                //日志读完了
                 if (bytes == null || bytes.length==0) {
                     throw new EOFException("Failed to read " + logFile);
                 }

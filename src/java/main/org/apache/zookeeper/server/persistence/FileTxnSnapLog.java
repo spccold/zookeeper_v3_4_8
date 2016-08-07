@@ -130,7 +130,9 @@ public class FileTxnSnapLog {
             PlayBackListener listener) throws IOException {
         snapLog.deserialize(dt, sessions);
         FileTxnLog txnLog = new FileTxnLog(dataDir);
+        //在snapshot的基础上再读取日志，恢复DataTree
         TxnIterator itr = txnLog.read(dt.lastProcessedZxid+1);
+        //初始为0
         long highestZxid = dt.lastProcessedZxid;
         TxnHeader hdr;
         try {
@@ -237,6 +239,7 @@ public class FileTxnSnapLog {
             ConcurrentHashMap<Long, Integer> sessionsWithTimeouts)
         throws IOException {
         long lastZxid = dataTree.lastProcessedZxid;
+        //filename: snapshot.zxid
         File snapshotFile = new File(snapDir, Util.makeSnapshotName(lastZxid));
         LOG.info("Snapshotting: 0x{} to {}", Long.toHexString(lastZxid),
                 snapshotFile);

@@ -129,8 +129,11 @@ public class SerializeUtils {
 
     public static void serializeSnapshot(DataTree dt,OutputArchive oa,
             Map<Long, Integer> sessions) throws IOException {
+        //对sessionWithTimeouts多一次深拷贝
         HashMap<Long, Integer> sessSnap = new HashMap<Long, Integer>(sessions);
+        //先写map size
         oa.writeInt(sessSnap.size(), "count");
+        //再写map的key，value
         for (Entry<Long, Integer> entry : sessSnap.entrySet()) {
             oa.writeLong(entry.getKey().longValue(), "id");
             oa.writeInt(entry.getValue().intValue(), "timeout");

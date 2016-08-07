@@ -87,6 +87,7 @@ public class BinaryInputArchive implements InputArchive {
     static public final int maxBuffer = Integer.getInteger("jute.maxbuffer", 0xfffff);
 
     public byte[] readBuffer(String tag) throws IOException {
+        //读完后，但是还没达到文件末尾(pre allcate), len将返回0
         int len = readInt(tag);
         if (len == -1) return null;
         checkLength(len);
