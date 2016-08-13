@@ -17,7 +17,16 @@
  */
 
 package org.apache.zookeeper.server.util;
-
+/**
+ * <pre>
+ * zxid(epoch(high 32bit)+count(low 32bit))
+ * epoch : 记录leader的变迁
+ * count : 记录每个leader任期内,数据更改的变迁
+ * </pre>
+ * 
+ * @author jileng
+ * @version $Id: ZxidUtils.java, v 0.1 2016年8月13日 下午8:29:54 jileng Exp $
+ */
 public class ZxidUtils {
 	static public long getEpochFromZxid(long zxid) {
 		return zxid >> 32L;

@@ -127,15 +127,14 @@ public class QuorumPeerMain {
       LOG.info("Starting quorum peer");
       try {
           ServerCnxnFactory cnxnFactory = ServerCnxnFactory.createFactory();
-          cnxnFactory.configure(config.getClientPortAddress(),
-                                config.getMaxClientCnxns());
+          cnxnFactory.configure(config.getClientPortAddress(), config.getMaxClientCnxns());
   
           quorumPeer = new QuorumPeer();
+          //useless
           quorumPeer.setClientPortAddress(config.getClientPortAddress());
-          quorumPeer.setTxnFactory(new FileTxnSnapLog(
-                      new File(config.getDataLogDir()),
-                      new File(config.getDataDir())));
+          quorumPeer.setTxnFactory(new FileTxnSnapLog(new File(config.getDataLogDir()), new File(config.getDataDir())));
           quorumPeer.setQuorumPeers(config.getServers());
+          //default tcp-based version of fast leader election
           quorumPeer.setElectionType(config.getElectionAlg());
           quorumPeer.setMyid(config.getServerId());
           quorumPeer.setTickTime(config.getTickTime());
@@ -147,10 +146,18 @@ public class QuorumPeerMain {
           quorumPeer.setCnxnFactory(cnxnFactory);
           quorumPeer.setZKDatabase(new ZKDatabase(quorumPeer.getTxnFactory()));
           quorumPeer.setLearnerType(config.getPeerType());
+          
+          //The observers now log transaction and write snapshot to disk by default like the participants. 
+          //This reduces the recovery time of the observers on restart. Set to "false" to disable this feature. Default is "true"
           quorumPeer.setSyncEnabled(config.getSyncEnabled());
+          
+          //When set to true the ZooKeeper server will listen for connections from its peers on all available IP addresses, 
+          //and not only the address configured in the server list of the configuration file. 
+          //It affects the connections handling the ZAB protocol and the Fast Leader Election protocol. Default value is false.
           quorumPeer.setQuorumListenOnAllIPs(config.getQuorumListenOnAllIPs());
-  
+          //启动当前quroum peer
           quorumPeer.start();
+          //让住线程堵塞
           quorumPeer.join();
       } catch (InterruptedException e) {
           // warn, but generally this is ok

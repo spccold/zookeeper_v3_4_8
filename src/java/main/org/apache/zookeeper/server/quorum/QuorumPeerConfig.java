@@ -57,13 +57,13 @@ public class QuorumPeerConfig {
 
     protected int initLimit;
     protected int syncLimit;
+    //defualt: Tcp-based version of fast leader election
     protected int electionAlg = 3;
     protected int electionPort = 2182;
     protected boolean quorumListenOnAllIPs = false;
-    protected final HashMap<Long,QuorumServer> servers =
-        new HashMap<Long, QuorumServer>();
-    protected final HashMap<Long,QuorumServer> observers =
-        new HashMap<Long, QuorumServer>();
+    //store all server in the current cluster ensemble
+    protected final HashMap<Long,QuorumServer> servers = new HashMap<Long, QuorumServer>();
+    protected final HashMap<Long,QuorumServer> observers = new HashMap<Long, QuorumServer>();
 
     protected long serverId;
     protected HashMap<Long, Long> serverWeight = new HashMap<Long, Long>();
@@ -178,6 +178,7 @@ public class QuorumPeerConfig {
                 purgeInterval = Integer.parseInt(value);
             } else if (key.startsWith("server.")) {
                 int dot = key.indexOf('.');
+                //sid = server id
                 long sid = Long.parseLong(key.substring(dot + 1));
                 String parts[] = value.split(":");
                 if ((parts.length != 2) && (parts.length != 3) && (parts.length !=4)) {
@@ -188,6 +189,7 @@ public class QuorumPeerConfig {
                 LearnerType type = null;
                 String hostname = parts[0];
                 Integer port = Integer.parseInt(parts[1]);
+                //选举端口
                 Integer electionPort = null;
                 if (parts.length > 2){
                 	electionPort=Integer.parseInt(parts[2]);
@@ -203,7 +205,7 @@ public class QuorumPeerConfig {
                 }
                 if (type == LearnerType.OBSERVER){
                     observers.put(Long.valueOf(sid), new QuorumServer(sid, hostname, port, electionPort, type));
-                } else {
+                } else {//默认为PARTICIPANT
                     servers.put(Long.valueOf(sid), new QuorumServer(sid, hostname, port, electionPort, type));
                 }
             } else if (key.startsWith("group")) {
@@ -357,8 +359,7 @@ public class QuorumPeerConfig {
             }
             
             // Warn about inconsistent peer type
-            LearnerType roleByServersList = observers.containsKey(serverId) ? LearnerType.OBSERVER
-                    : LearnerType.PARTICIPANT;
+            LearnerType roleByServersList = observers.containsKey(serverId) ? LearnerType.OBSERVER : LearnerType.PARTICIPANT;
             if (roleByServersList != peerType) {
                 LOG.warn("Peer type from servers list (" + roleByServersList
                         + ") doesn't match peerType (" + peerType

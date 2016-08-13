@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * <li>Follower - the server will synchronize with the leader and replicate any
  * transactions.</li>
  * <li>Leader - the server will process requests and forward them to followers.
- * A majority of followers must log the request before it can be accepted.
+ * A majority of followers(超过半数的followers) must log the request before it can be accepted.
  * </ol>
  *
  * This class will setup a datagram socket that will always respond with its
@@ -95,27 +95,6 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     private ZKDatabase zkDb;
 
     public static class QuorumServer {
-        private QuorumServer(long id, InetSocketAddress addr,
-                InetSocketAddress electionAddr) {
-            this.id = id;
-            this.addr = addr;
-            this.electionAddr = electionAddr;
-        }
-
-        private QuorumServer(long id, InetSocketAddress addr) {
-            this.id = id;
-            this.addr = addr;
-            this.electionAddr = null;
-        }
-        
-        private QuorumServer(long id, InetSocketAddress addr,
-                    InetSocketAddress electionAddr, LearnerType type) {
-            this.id = id;
-            this.addr = addr;
-            this.electionAddr = electionAddr;
-            this.type = type;
-        }
-        
         public QuorumServer(long id, String hostname,
                             Integer port, Integer electionPort,
                             LearnerType type) {
@@ -149,6 +128,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
                 LOG.info("Resolved hostname: {} to address: {}", this.hostname, address);
                 this.addr = new InetSocketAddress(address, this.port);
                 if (this.electionPort > 0){
+                    //选举地址，监听选举请求
                     this.electionAddr = new InetSocketAddress(address, this.electionPort);
                 }
             } catch (UnknownHostException ex) {
@@ -195,7 +175,11 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
      * conditions change (e.g. which state to become after LOOKING). 
      */
     public enum LearnerType {
-        PARTICIPANT, OBSERVER;
+        //可以参与选举，也可以成为leader
+        PARTICIPANT, 
+        OBSERVER,
+        
+        ;
     }
     
     /*
@@ -504,8 +488,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     }
 
     private void loadDataBase() {
-        File updating = new File(getTxnFactory().getSnapDir(),
-                                 UPDATING_EPOCH_FILENAME);
+        File updating = new File(getTxnFactory().getSnapDir(), UPDATING_EPOCH_FILENAME);
 		try {
             zkDb.loadDataBase();
 
@@ -1174,7 +1157,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     public int getClientPort() {
         return cnxnFactory.getLocalPort();
     }
-
+    //useless
     public void setClientPortAddress(InetSocketAddress addr) {
     }
  

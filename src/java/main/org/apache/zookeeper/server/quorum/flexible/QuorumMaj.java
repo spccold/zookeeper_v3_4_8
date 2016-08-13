@@ -20,19 +20,12 @@ package org.apache.zookeeper.server.quorum.flexible;
 
 import java.util.HashSet;
 
-//import org.apache.zookeeper.server.quorum.QuorumCnxManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This class implements a validator for majority quorums. The 
  * implementation is straightforward.
  *
  */
 public class QuorumMaj implements QuorumVerifier {
-    private static final Logger LOG = LoggerFactory.getLogger(QuorumMaj.class);
-    
     int half;
     
     /**
