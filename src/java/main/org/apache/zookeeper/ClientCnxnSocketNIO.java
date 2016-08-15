@@ -365,7 +365,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         for (SelectionKey k : selected) {
             SocketChannel sc = ((SocketChannel) k.channel());
             if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {//发生于connect返回false， not immediate connect 
-                if (sc.finishConnect()) {//no-blocking模式下，可能会连接多次
+                if (sc.finishConnect()) {//no-blocking模式下，可能会连接多次, 但是netty在这里的实现好像只处理一次，否则就抛出ConnectTimeout
                     updateLastSendAndHeard();
                     sendThread.primeConnection();
                 }
