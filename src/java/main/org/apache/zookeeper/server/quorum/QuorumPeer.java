@@ -100,6 +100,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
                             LearnerType type) {
 	        this.id = id;
 	        this.hostname=hostname;
+	        // other followers will connect to this port when current quroum peer become leader
 	        if (port!=null){
                 this.port=port;
 	        }
@@ -418,7 +419,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     }
 
     DatagramSocket udpSocket;
-
+    //当前quroum peer的地址，当成为leader后， followers and observers will connect to this address
     private InetSocketAddress myQuorumAddr;
 
     public InetSocketAddress getQuorumAddress(){
@@ -482,7 +483,8 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     @Override
     public synchronized void start() {
         loadDataBase();
-        cnxnFactory.start();        
+        cnxnFactory.start();  
+        //开始leader选举, exciting!
         startLeaderElection();
         super.start();
     }
@@ -493,7 +495,9 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
             zkDb.loadDataBase();
 
             // load the epochs
+            //新机器初始化为0
             long lastProcessedZxid = zkDb.getDataTree().lastProcessedZxid;
+            //新机器初始化为0
     		long epochOfZxid = ZxidUtils.getEpochFromZxid(lastProcessedZxid);
             try {
             	currentEpoch = readLongFromFile(CURRENT_EPOCH_FILENAME);
@@ -565,6 +569,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
         if (myQuorumAddr == null) {
             throw new RuntimeException("My id " + myid + " not in the peer list");
         }
+        //默认为3  tcp-based
         if (electionType == 0) {
             try {
                 udpSocket = new DatagramSocket(myQuorumAddr.getPort());
@@ -640,13 +645,11 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     public Observer observer;
 
     protected Follower makeFollower(FileTxnSnapLog logFactory) throws IOException {
-        return new Follower(this, new FollowerZooKeeperServer(logFactory, 
-                this,new ZooKeeperServer.BasicDataTreeBuilder(), this.zkDb));
+        return new Follower(this, new FollowerZooKeeperServer(logFactory, this, new ZooKeeperServer.BasicDataTreeBuilder(), this.zkDb));
     }
      
     protected Leader makeLeader(FileTxnSnapLog logFactory) throws IOException {
-        return new Leader(this, new LeaderZooKeeperServer(logFactory,
-                this,new ZooKeeperServer.BasicDataTreeBuilder(), this.zkDb));
+        return new Leader(this, new LeaderZooKeeperServer(logFactory, this,new ZooKeeperServer.BasicDataTreeBuilder(), this.zkDb));
     }
     
     protected Observer makeObserver(FileTxnSnapLog logFactory) throws IOException {
@@ -716,8 +719,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
 
     @Override
     public void run() {
-        setName("QuorumPeer" + "[myid=" + getId() + "]" +
-                cnxnFactory.getLocalAddress());
+        setName("QuorumPeer" + "[myid=" + getId() + "]" + cnxnFactory.getLocalAddress());
 
         LOG.debug("Starting quorum peer");
         try {
@@ -894,6 +896,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
      * ensemble.    
      */
     public Map<Long,QuorumPeer.QuorumServer> getView() {
+        //just for read
         return Collections.unmodifiableMap(this.quorumPeers);
     }
     
@@ -902,8 +905,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
      * PeerType=PARTICIPANT.     
      */
     public Map<Long,QuorumPeer.QuorumServer> getVotingView() {
-        Map<Long,QuorumPeer.QuorumServer> ret = 
-            new HashMap<Long, QuorumPeer.QuorumServer>();
+        Map<Long,QuorumPeer.QuorumServer> ret = new HashMap<Long, QuorumPeer.QuorumServer>();
         Map<Long,QuorumPeer.QuorumServer> view = getView();
         for (QuorumServer server : view.values()) {            
             if (server.type == LearnerType.PARTICIPANT) {

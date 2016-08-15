@@ -358,8 +358,7 @@ public class Leader {
      */
     void lead() throws IOException, InterruptedException {
         self.end_fle = System.currentTimeMillis();
-        LOG.info("LEADING - LEADER ELECTION TOOK - " +
-              (self.end_fle - self.start_fle));
+        LOG.info("LEADING - LEADER ELECTION TOOK - " +(self.end_fle - self.start_fle));
         self.start_fle = 0;
         self.end_fle = 0;
 
@@ -385,13 +384,11 @@ public class Leader {
                 lastProposed = zk.getZxid();
             }
             
-            newLeaderProposal.packet = new QuorumPacket(NEWLEADER, zk.getZxid(),
-                    null, null);
+            newLeaderProposal.packet = new QuorumPacket(NEWLEADER, zk.getZxid(), null, null);
 
 
             if ((newLeaderProposal.packet.getZxid() & 0xffffffffL) != 0) {
-                LOG.info("NEWLEADER proposal has Zxid of "
-                        + Long.toHexString(newLeaderProposal.packet.getZxid()));
+                LOG.info("NEWLEADER proposal has Zxid of " + Long.toHexString(newLeaderProposal.packet.getZxid()));
             }
             
             waitForEpochAck(self.getId(), leaderStateSummary);
@@ -403,8 +400,7 @@ public class Leader {
             try {
                 waitForNewLeaderAck(self.getId(), zk.getZxid(), LearnerType.PARTICIPANT);
             } catch (InterruptedException e) {
-                shutdown("Waiting for a quorum of followers, only synced with sids: [ "
-                        + getSidSetString(newLeaderProposal.ackSet) + " ]");
+                shutdown("Waiting for a quorum of followers, only synced with sids: [ "+ getSidSetString(newLeaderProposal.ackSet) + " ]");
                 HashSet<Long> followerSet = new HashSet<Long>();
                 for (LearnerHandler f : learners)
                     followerSet.add(f.getSid());
@@ -472,10 +468,9 @@ public class Leader {
                 }
 
               if (!tickSkip && !self.getQuorumVerifier().containsQuorum(syncedSet)) {
-                //if (!tickSkip && syncedCount < self.quorumPeers.size() / 2) {
+                    //if (!tickSkip && syncedCount < self.quorumPeers.size() / 2) {
                     // Lost quorum, shutdown
-                    shutdown("Not sufficient followers synced, only synced with sids: [ "
-                            + getSidSetString(syncedSet) + " ]");
+                    shutdown("Not sufficient followers synced, only synced with sids: [ "+ getSidSetString(syncedSet) + " ]");
                     // make sure the order is the same!
                     // the leader goes to looking
                     return;

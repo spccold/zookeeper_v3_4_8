@@ -19,15 +19,15 @@
 package org.apache.zookeeper.server.quorum;
 
 import org.apache.zookeeper.server.quorum.QuorumPeer.ServerState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-
+/**
+ * Vote: 提议
+ * 
+ * @author jileng
+ * @version $Id: Vote.java, v 0.1 2016年8月13日 下午8:49:18 jileng Exp $
+ */
 public class Vote {
-    private static final Logger LOG = LoggerFactory.getLogger(Vote.class);
-    
-    public Vote(long id, 
-                    long zxid) {
+    public Vote(long id, long zxid) {
         this.version = 0x0;
         this.id = id;
         this.zxid = zxid;
@@ -36,9 +36,13 @@ public class Vote {
         this.state = ServerState.LOOKING;
     }
     
-    public Vote(long id, 
-                    long zxid, 
-                    long peerEpoch) {
+    /**
+     * 
+     * @param id  myid
+     * @param zxid  current quorum peer last processed zxid
+     * @param peerEpoch (epoch:新纪元，新时代)
+     */
+    public Vote(long id, long zxid, long peerEpoch) {
         this.version = 0x0;
         this.id = id;
         this.zxid = zxid;
