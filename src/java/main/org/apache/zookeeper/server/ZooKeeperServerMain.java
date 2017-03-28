@@ -51,7 +51,7 @@ public class ZooKeeperServerMain {
         try {
            //main.initializeAndRun(args);
            //TODO for learn
-           main.initializeAndRun(new String[]{"/home/spccold/github/zookeeper_v3_4_8/conf/zoo.cfg"});
+        	main.initializeAndRun(new String[]{ZooKeeperServerMain.class.getClassLoader().getResource("zoo.cfg").getPath()});
         } catch (IllegalArgumentException e) {
             LOG.error("Invalid arguments, exiting abnormally", e);
             LOG.info(USAGE);
