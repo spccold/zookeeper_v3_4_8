@@ -47,7 +47,6 @@ public final class ConnectStringParser {
      */
     public ConnectStringParser(String connectString) {
         // parse out chroot, if any
-        // 存在多个server的时候,chroot只要写在其中某一个server上就ok了
         int off = connectString.indexOf('/');
         if (off >= 0) {
             String chrootPath = connectString.substring(off);

@@ -439,7 +439,7 @@ public class ZooKeeper {
                 + " sessionTimeout=" + sessionTimeout + " watcher=" + watcher);
 
         watchManager.defaultWatcher = watcher;
-
+        //chroot at end of connectString
         ConnectStringParser connectStringParser = new ConnectStringParser(
                 connectString);
         // client host选择策略
@@ -1492,7 +1492,7 @@ public class ZooKeeper {
      * Return the list of the children of the node of the given path.
      * <p>
      * If the watch is non-null and the call is successful (no exception is thrown),
-     * a watch will be left on the node with the given path. The watch willbe
+     * a watch will be left on the node with the given path. The watch will be
      * triggered by a successful operation that deletes the node of the given
      * path or creates/delete a child under the node.
      * <p>
@@ -1541,7 +1541,7 @@ public class ZooKeeper {
      * Return the list of the children of the node of the given path.
      * <p>
      * If the watch is true and the call is successful (no exception is thrown),
-     * a watch will be left on the node with the given path. The watch willbe
+     * a watch will be left on the node with the given path. The watch will be
      * triggered by a successful operation that deletes the node of the given
      * path or creates/delete a child under the node.
      * <p>
@@ -1606,7 +1606,7 @@ public class ZooKeeper {
      * For the given znode path return the stat and children list.
      * <p>
      * If the watch is non-null and the call is successful (no exception is thrown),
-     * a watch will be left on the node with the given path. The watch willbe
+     * a watch will be left on the node with the given path. The watch will be
      * triggered by a successful operation that deletes the node of the given
      * path or creates/delete a child under the node.
      * <p>
