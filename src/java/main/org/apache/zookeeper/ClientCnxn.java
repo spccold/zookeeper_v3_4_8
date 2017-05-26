@@ -464,7 +464,7 @@ public class ClientCnxn {
             super(makeThreadName("-EventThread"));
             setDaemon(true);
         }
-
+        // just for watcher
         public void queueEvent(WatchedEvent event) {
             if (event.getType() == EventType.None && sessionState == event.getState()) {
                 return;
@@ -479,7 +479,8 @@ public class ClientCnxn {
             // queue the pair (watch set & event) for later processing
             waitingEvents.add(pair);
         }
-
+       
+        //just for AsyncCallBack
        public void queuePacket(Packet packet) {
           if (wasKilled) {
              synchronized (waitingEvents) {
